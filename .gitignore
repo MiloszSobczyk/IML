@@ -5,9 +5,10 @@
 
 # Self-declared files
 
+!*.gitkeep
+
 resources/daps/*
 resources/spectrograms/*
-!*.gitkeep
 
 # User-specific files
 *.rsuser
