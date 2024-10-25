@@ -3,7 +3,7 @@ Project carried out as part of the Introduction to Machine Learning course in th
 
 # Setup
 ### Generate your own files
-To generate spectrograms extract contents of file from https://zenodo.org/records/4660670 into the *./resources* folder and remove non-wav files. You can do most of this by runnning:
+To generate spectrograms extract contents of file from https://zenodo.org/records/4660670 into the *./resources/daps* folder and remove non-wav files. You can do most of this by runnning:
 ```
 cd ./resources 
 python cleanup.py
@@ -14,5 +14,3 @@ You may need to install additional python packages using *pip*.
 
 ### Already generated files
 Just put them in the resources folder.
-
-Congrats!
