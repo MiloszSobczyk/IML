@@ -13,4 +13,4 @@ Some files won't be deleted, since I was lazy and didn't want to write more code
 You may need to install additional python packages using *pip*.
 
 ### Already generated files
-Just put them in the resources folder.
+Just put them in the *./resources/sepctrograms' folder.
