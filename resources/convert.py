@@ -5,7 +5,7 @@ import scipy.io.wavfile as wav
 from matplotlib import pyplot as plt
 from numpy.lib import stride_tricks
 
-def STFT(sig, frameSize, overlapFactor = 0.5, window = np.hanning):
+def STFT(sig, frameSize, overlapFactor = 0.75, window = np.hanning):  # Zwiększenie overlapFactor
     win = window(frameSize)
     hopSize = int(frameSize - np.floor(overlapFactor * frameSize))
     samples = np.append(np.zeros(int(np.floor(frameSize / 2.0))), sig)
@@ -14,6 +14,7 @@ def STFT(sig, frameSize, overlapFactor = 0.5, window = np.hanning):
     frames = stride_tricks.as_strided(samples, shape = (int(cols), frameSize),
                                       strides = (samples.strides[0] * hopSize, samples.strides[0])).copy()
     frames *= win
+
     return np.fft.rfft(frames)
 
 def LogarithmicScale(spec, sr=44100, factor=20.):
@@ -27,8 +28,10 @@ def LogarithmicScale(spec, sr=44100, factor=20.):
             newspec[:, i] = np.sum(spec[:, int(scale[i]):], axis=1)
         else:
             newspec[:, i] = np.sum(spec[:, int(scale[i]):int(scale[i + 1])], axis=1)
+
     allfreqs = np.abs(np.fft.fftfreq(freqbins * 2, 1. / sr)[:freqbins + 1])
     freqs = [np.mean(allfreqs[int(scale[i]):int(scale[i + 1])]) if i < len(scale) - 1 else np.mean(allfreqs[int(scale[i]):]) for i in range(len(scale))]
+    
     return newspec, freqs
 
 def PlotSTFT(samples, sampleRate, outputFilePath, binSize, colormap, minDB = -80):
@@ -45,7 +48,7 @@ def PlotSTFT(samples, sampleRate, outputFilePath, binSize, colormap, minDB = -80
     plt.savefig(outputFilePath, bbox_inches = "tight", pad_inches = 0)
     plt.close()
 
-def ProcessAndDenoiseDirectory(rootDirPath, binSize = 2 ** 10, colormap = "gray", segmentDuration = 2, noiseSampleDuration = 0.5, propDecrease = 0.5):
+def ProcessAndDenoiseDirectory(rootDirPath, binSize = 512, colormap = "gray", segmentDuration = 2, noiseSampleDuration = 0.5, propDecrease = 0.5):
     for dirPath, _, fileNames in os.walk(rootDirPath):
         if 'spectrograms' in dirPath or 'daps' not in dirPath:
             continue
@@ -72,7 +75,7 @@ def ProcessAndDenoiseDirectory(rootDirPath, binSize = 2 ** 10, colormap = "gray"
                 end = min(start + segmentSamples, len(reducedNoiseSamples))
                 segment = reducedNoiseSamples[start:end]
 
-                noSuffixOutputFilePath = os.path.join(outputDirPath, f"{fileName[:-4]}_spectrogram_{i + 1}.png")
-                PlotSTFT(segment, sampleRate, noSuffixOutputFilePath, binSize = binSize, colormap = colormap)
+                outputFilePath = os.path.join(outputDirPath, f"{fileName[:-4]}_spectrogram_{i + 1}.png")
+                PlotSTFT(segment, sampleRate, outputFilePath, binSize = binSize, colormap = colormap)
 
 ProcessAndDenoiseDirectory('./')
