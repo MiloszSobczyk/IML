@@ -17,7 +17,7 @@ def STFT(sig, frameSize, overlapFactor=0.75, window=np.hanning):
 
     return np.fft.rfft(frames)
 
-def LogarithmicScale(spec, sr=44100, factor=20.):
+def LogarithmicScale(spec, sr=16000, factor=20.):
     timebins, freqbins = np.shape(spec)
     scale = np.linspace(0, 1, freqbins) ** factor
     scale *= (freqbins - 1) / max(scale)
@@ -65,7 +65,7 @@ def ProcessAndDenoiseDirectory(rootDirPath, denoise=True, binSize=512, colormap=
     for dirPath, _, fileNames in os.walk(rootDirPath):
         if 'spectrograms' in dirPath or 'daps' not in dirPath:
             continue
-        outputDirPath = (rootDirPath + 'spectrograms/' + dirPath[7:]).replace('\\', '/')
+        outputDirPath = (rootDirPath + 'spectrograms_3/' + dirPath[7:]).replace('\\', '/')
         os.makedirs(outputDirPath, exist_ok=True)
 
         for fileName in fileNames:
