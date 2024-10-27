@@ -8,7 +8,7 @@
 !*.gitkeep
 
 resources/daps/*
-resources/spectrograms/*
+resources/spectrograms*/*
 
 # User-specific files
 *.rsuser
