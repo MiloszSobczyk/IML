@@ -48,34 +48,36 @@ def PlotSTFT(samples, sampleRate, outputFilePath, binSize, colormap, minDB = -80
     plt.savefig(outputFilePath, bbox_inches = "tight", pad_inches = 0)
     plt.close()
 
-def ProcessAndDenoiseDirectory(rootDirPath, binSize = 512, colormap = "gray", segmentDuration = 2, noiseSampleDuration = 0.5, propDecrease = 0.5):
+def ProcessAndDenoiseDirectory(rootDirPath, denoise = True , binSize = 512, colormap = "gray", segmentDuration = 2, noiseSampleDuration = 0.5, propDecrease = 0.5):
     for dirPath, _, fileNames in os.walk(rootDirPath):
         if 'spectrograms' in dirPath or 'daps' not in dirPath:
             continue
         outputDirPath = (rootDirPath + 'spectrograms/' + dirPath[7:]).replace('\\', '/')
         os.makedirs(outputDirPath, exist_ok = True)
-        
+
         for fileName in fileNames:
             if not fileName.endswith('.wav'):
                 continue
 
             inputFilePath = os.path.join(dirPath, fileName).replace('\\', '/')
             sampleRate, samples = wav.read(inputFilePath)
-            
-            noiseSamples = int(noiseSampleDuration * sampleRate)
-            noiseSample = samples[:noiseSamples]
-            
-            reducedNoiseSamples = nr.reduce_noise(y = samples, sr = sampleRate, y_noise = noiseSample, prop_decrease = propDecrease)
-            
+
+            if(denoise):
+                noiseSamples = int(noiseSampleDuration * sampleRate)
+                noiseSample = samples[:noiseSamples]
+
+                reducedNoiseSamples = nr.reduce_noise(y = samples, sr = sampleRate, y_noise = noiseSample, prop_decrease = propDecrease)
+                samples = reducedNoiseSamples
+
             segmentSamples = segmentDuration * sampleRate
-            segmentsCount = int(np.ceil(len(reducedNoiseSamples) / segmentSamples))
+            segmentsCount = int(np.ceil(len(samples) / segmentSamples))
 
             for i in range(segmentsCount):
                 start = i * segmentSamples
-                end = min(start + segmentSamples, len(reducedNoiseSamples))
-                segment = reducedNoiseSamples[start:end]
+                end = min(start + segmentSamples, len(samples))
+                segment = samples[start:end]
 
                 outputFilePath = os.path.join(outputDirPath, f"{fileName[:-4]}_spectrogram_{i + 1}.png")
                 PlotSTFT(segment, sampleRate, outputFilePath, binSize = binSize, colormap = colormap)
 
-ProcessAndDenoiseDirectory('./')
+ProcessAndDenoiseDirectory('./', False)
