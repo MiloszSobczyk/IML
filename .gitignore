@@ -10,7 +10,6 @@
 resources/daps/*
 resources/spectrograms*/*
 
-*.png
 
 # User-specific files
 *.rsuser
